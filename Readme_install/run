@@ -1,0 +1,67 @@
+#Installing Ollama on android
+
+#Step 1 
+#Install termux (latest version)
+  #Run these commands
+      #Used to grant Termux access to your Android device’s storage
+    termux-setup-storage
+      #Changes the default package repository
+    termux-change-repo
+      #Upgrades all installed packages in Termux
+    pkg upgrade
+      #Installs git, cmake, and golang
+    pkg install git cmake golang
+
+#Step 2
+  #Setup Ollama
+      #Clones Git repository from GitHub --depth 1 tells Git to only fetch the latest commit
+    git clone --depth 1 https://github.com/ollama/ollama.git
+      #Changes current working directory to the newly cloned ollama folder
+    cd ollama
+      #This command runs Go’s code generation tool (go generate) on all packages within the current directory and its subdirectories 
+    go generate ./...
+      #Compiles the Go source files in the current directory and its subdirectories into an executable binary.
+    go build .
+      #This command runs the compiled ollama executable in the background (&). ./ollama serve: This is a typical way to run a server application. The serve argument might be specific to how the ollama program is designed.
+    ./ollama serve &
+
+#Step 3
+  #Pull LLM models
+    ./ollama run <model name here>
+    #See https://ollama.com/library for full list
+    #Recomend the following: tinyllama, tinydolphin, and llama3.2:1b 
+
+
+#Now for what I had to do because the Go module setup was incomplete
+  #Commands to run to fix it.
+      #Checks the version of Go just to make sure it's installed 
+    go version
+      #Upgrades all installed packages in Termux
+    pkg update
+      #Only necessary if no version returned command not found
+    pkg install golang
+      #Clones Git repository from GitHub --depth 1 tells Git to only fetch the latest commit
+    git clone --depth 1 https://github.com/ollama/ollama.git 
+      #Changes directory to installed directory 
+    cd ollama
+      #Check for go.mod: After cloning, confirm that the repository contains a go.mod file in the root directory:
+    ls -la
+      #If go.mod is missing, the repository may not be set up as a Go module. You'll need to initialize it:
+    go mod init ollama
+      #Run this command to clean up and update your Go modules.
+    go mod tidy
+      #Runs Go’s code generation tool on all packages within the current directory and its subdirectories
+    go generate ./...
+      #Compiles the Go source files in the current directory and its subdirectories into an executable binary named ollama
+    go build -o ollama .
+      #This command runs the compiled ollama executable in the background
+    ./ollama serve &
+
+#Return to step 3
+
+  #Getting back in after exit
+  #Step 1
+    #Reopen/open termux and cd into ollama folder
+  cd ./ollama
+  #Now we can run a model
+  ./ollama run <Model name>
